@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Animal Name Generator</title>
+    <!-- Here we have CSS styles -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 20px 0;
+            cursor: pointer;
+            background-color: red;
+        }
+        #monster-canvas {
+            border: 2px solid #000;
+            margin: 20px auto;
+            display: block;
+        }
+        #generated-name {
+            font-size: 100px;
+            font-weight: bold;
+            margin-top: 20px;
+            min-height: 30px;
+            
+        }
+        
+    </style>
+</head>
+<body>
+    <h1>Random Animal Name Generator</h1>
+    <canvas id="monster-canvas" width="400" height="400"></canvas>
+    <button id="generate-button">Generate Name</button>
+    <div id="generated-name"></div>
+
+    <script>
+        // This section contains the lists of words we use to create names
+          // List of animal names to choose from
+        const animal_names = [
+          'Lupo',
+          'Orso',
+          'Aquila',
+          'Volpe',
+          'Tartaruga',
+          'Civetta',    
+          'Cervo',
+          'Riccio',
+          'Falco',
+          'Fagiano',
+          'Castoro',
+          'Ghiro',
+          'Lince',
+          'Scoiattolo',
+          'Gufo',
+          'Furetto',
+          'Cerbiatto',
+          'Pettirosso',
+          'Rana',
+          'Drago'
+        ];
+        
+        // List of attributes for the animals
+        const attributes = [
+            'Silente',
+            'Astuto',
+            'Vigile',
+            'Tenace',
+            'Allegro',
+            'Saggio',
+            'Curioso',
+            'Forte',
+            'Libero',
+            'Calmo',
+            'Rapido',
+            'Attento',
+            'Resistente',
+            'Ingenuo',
+            'Giocoso',
+            'Fedele',
+            'Vivace',
+            'Paziente',
+            'Scaltro',
+            'Costante'
+        ];
+        
+        // List of color names 
+        const colors = [
+            'red', 'blue', 'green', 'pink', 'orange', 'purple', 'brown', 'gray', 'yellow', 'cyan', 'magenta', 'lime', 'teal', 'indigo', 'violet', 'gold', 'silver', 'maroon', 'navy', 'olive'
+        ];  
+        
+        // Image paths for each body part (one random picked from each folder)
+        const headSources = ['images/head/01.png', 'images/head/02.png', 'images/head/03.png'];
+        const bodySources = ['images/body/01.png', 'images/body/02.png', 'images/body/03.png'];
+        const feetSources = ['images/feet/01.png', 'images/feet/02.png', 'images/feet/03.png'];
+        
+        const headImages = [];
+        const bodyImages = [];
+        const feetImages = [];
+        
+        function loadPart(sources, dest) {
+            return new Promise(resolve => {
+                let loaded = 0;
+                sources.forEach(src => {
+                    const img = new Image();
+                    img.onload = () => {
+                        loaded++;
+                        if (loaded === sources.length) resolve();
+                    };
+                    img.src = src;
+                    dest.push(img);
+                });
+            });
+        }
+        
+        Promise.all([
+            loadPart(headSources, headImages),
+            loadPart(bodySources, bodyImages),
+            loadPart(feetSources, feetImages)
+        ]).then(() => generateMonster());
+
+        // This section has the functions that do the work
+        
+        // Function to pick a random animal and attribute and combine them
+        function generateRandomAnimalName() {
+            const animal = animal_names[Math.floor(Math.random() * animal_names.length)];
+            const attribute = attributes[Math.floor(Math.random() * attributes.length)];
+            return `${attribute} ${animal}`;
+        }
+        
+        // Function to pick a random color
+        function getRandomColor() {
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            return color;
+        }
+        
+        // Function to generate and draw the monster on the canvas
+        function generateMonster() {
+            const canvas = document.getElementById('monster-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const partHeight = canvas.height / 3;
+            const headImg = headImages[Math.floor(Math.random() * headImages.length)];
+            const bodyImg = bodyImages[Math.floor(Math.random() * bodyImages.length)];
+            const feetImg = feetImages[Math.floor(Math.random() * feetImages.length)];
+            
+            ctx.drawImage(headImg, 0, 0, canvas.width, partHeight);
+            ctx.drawImage(bodyImg, 0, partHeight, canvas.width, partHeight);
+            ctx.drawImage(feetImg, 0, partHeight * 2, canvas.width, partHeight);
+        }
+
+        // This section connects the button to the functions
+        
+        // Find the button and the place where the name will appear
+        const generateBtn = document.getElementById('generate-button');
+        const generatedNameDiv = document.getElementById('generated-name');
+
+        // When the button is clicked, generate a name and color, and show them
+        generateBtn.addEventListener('click', function() {
+            const randomName = generateRandomAnimalName();
+            const randomColor = getRandomColor();
+            generatedNameDiv.textContent = randomName;
+            generatedNameDiv.style.color = randomColor;
+            generateMonster();
+        });
+    </script>
+</body>
+</html>
